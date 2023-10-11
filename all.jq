@@ -6,7 +6,7 @@ try {
  name1: ([
    ."Project #1"."Member #1 First Name",
    ."Project #1"."Member #1 Last Name"] | join(" ")),
- name2: ([
+ name2: (try [
   ."Project #1"."Member #2 First Name",
   ."Project #1"."Member #2 Last Name"] | join(" "))
 }

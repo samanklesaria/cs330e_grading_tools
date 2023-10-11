@@ -18,11 +18,13 @@ def download(cmd, name):
   for p in load_iter(run(cmd)):
     results[str(name)].update({"pipelines": p})
 
-with ThreadPoolExecutor(max_workers=100) as executor:
-  for obj in load_iter(run("jq -f all.jq submissions/*.json")):
-    cmd = f"curl 'https://gitlab.com/api/v4/projects/{obj['uri']}/pipelines?private_token={token}' | jq length"
-    results[obj["name"]].update(obj)
-    executor.submit(lambda: download(cmd, obj['name']))
+# with ThreadPoolExecutor(max_workers=10) as executor:
+for obj in load_iter(run("jq -f all.jq submissions/*.json | tee raw.json")):
+  cmd = f"curl 'https://gitlab.com/api/v4/projects/{obj['uri']}/pipelines?private_token={token}' | tee uris/{obj['uri']} | jq length"
+  results[obj["name"]].update(obj)
+  download(cmd, obj['name'])
+    # executor.submit(lambda: download(cmd, obj['name']))
+# executor.shutdown()
 
 for f in glob.glob("cs330e-collatz-tests/*TestCollatz.out"):
   name = path.basename(f).split("-TestCollatz.out")[0]
